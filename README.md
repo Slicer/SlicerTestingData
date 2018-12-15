@@ -6,7 +6,7 @@ This is a mirror for the Slicer testing data.
 To support content-based addressing, files are uploaded as assets organized in [releases](https://github.com/Slicer/SlicerTestingData/releases)
 named after the hashing algorithm.
 
-For each hashing algorithm `<HASHALGO>`, the following are available:
+For each hashing algorithm `<HASHALGO>`, you will find:
 * release named `<HASHALGO>`
 * markdown document `<HASHALGO>.md` with links of the form `* [<filename>](https://github.com/Slicer/SlicerTestingData/releases/download/<HASHALGO>/<checksum>)`
 * a CSV file `<HASHALGO>.csv` listing all `<hashsum>;<filename>` pairs
@@ -42,9 +42,9 @@ $ /path/to/SlicerTestingData/scripts/update.sh SHA256
 
 ```
 $ hashalgo=SHA256
-$ git add ${hashalgo}.md ${hashalgo}.csv
-$ git commit -m "Update files associated with ${hashalgo}"
-$ git push origin master
+$ git add ${hashalgo}.md ${hashalgo}.csv && \
+  git commit -m "Update files associated with ${hashalgo}" && \
+  git push origin master
 ```
 
 
