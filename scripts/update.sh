@@ -106,6 +106,8 @@ for hashalgo in ${hashalgos}; do
 
   #----
   echo "${hashalgo}: uploading release assets"
+  echo "| FileName | ${hashalgo} |" >> ${root_dir}/${hashalgo}.md
+  echo "|----------|-------------|" >> ${root_dir}/${hashalgo}.md
   for line in $(cat ${root_dir}/${hashalgo}.csv); do
     checksum=$(echo ${line} | cut -d";" -f1)
     filename=$(echo ${line} | cut -d";" -f2)
@@ -115,7 +117,7 @@ for hashalgo in ${hashalgos}; do
     else
       githubrelease asset Slicer/SlicerTestingData upload ${hashalgo} ${root_dir}/${hashalgo}/${checksum}
     fi
-    echo "* [$filename](https://github.com/Slicer/SlicerTestingData/releases/download/${hashalgo}/${checksum})" >> ${root_dir}/${hashalgo}.md
+    echo "| [$filename](https://github.com/Slicer/SlicerTestingData/releases/download/${hashalgo}/${checksum}) | ${checksum} |" >> ${root_dir}/${hashalgo}.md
   done
   echo
 
