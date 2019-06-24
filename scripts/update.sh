@@ -85,6 +85,10 @@ for hashalgo in ${hashalgos}; do
   echo
 
   #----
+  echo "${hashalgo}: creating ${hashalgo} release"
+  githubrelease release Slicer/SlicerTestingData create ${hashalgo} --publish
+
+  #----
   echo "${hashalgo}: retrieving list of uploaded assets"
   set +o pipefail
   uploaded_assets=$(
