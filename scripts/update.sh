@@ -127,7 +127,8 @@ for hashalgo in ${hashalgos}; do
 
   #----
   echo "${hashalgo}: updating ${hashalgo}.csv and ${hashalgo}.md"
-  githubrelease asset Slicer/SlicerTestingData delete ${hashalgo} "${hashalgo}.csv ${hashalgo}.md"
+  githubrelease asset Slicer/SlicerTestingData delete ${hashalgo} "${hashalgo}.csv"
+  githubrelease asset Slicer/SlicerTestingData delete ${hashalgo} "${hashalgo}.md"
   githubrelease asset Slicer/SlicerTestingData upload ${hashalgo} ${root_dir}/${hashalgo}.csv ${root_dir}/${hashalgo}.md
   echo
 
