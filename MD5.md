@@ -116,3 +116,6 @@
 | [ThresholdScalarVolumeTest.raw.gz](https://github.com/Slicer/SlicerTestingData/releases/download/MD5/2850a94e923ceb83f20c5207efa48e09) | 2850a94e923ceb83f20c5207efa48e09 |
 | [VotingBinaryHoleFillingImageFilterTest.nhdr](https://github.com/Slicer/SlicerTestingData/releases/download/MD5/1738e6000c7e182c12292f15359edec4) | 1738e6000c7e182c12292f15359edec4 |
 | [VotingBinaryHoleFillingImageFilterTest.raw.gz](https://github.com/Slicer/SlicerTestingData/releases/download/MD5/2ade36830e99e17c63fa7f29a00c6e0d) | 2ade36830e99e17c63fa7f29a00c6e0d |
+| [ITKSnapSegmentation.nii.gz](https://github.com/Slicer/SlicerTestingData/releases/download/MD5/c120e8dbe44741a0750960a44142120d) | c120e8dbe44741a0750960a44142120d |
+| [OldSlicerSegmentation.seg.nrrd](https://github.com/Slicer/SlicerTestingData/releases/download/MD5/d72691e556ed51d122365739058c0353) | d72691e556ed51d122365739058c0353 |
+| [SlicerSegmentation.seg.nrrd](https://github.com/Slicer/SlicerTestingData/releases/download/MD5/b5ac535a252adbfb78ea84ab0f11d22f) | b5ac535a252adbfb78ea84ab0f11d22f |
