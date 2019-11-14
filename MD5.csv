@@ -117,3 +117,5 @@ f3b6bade4c2e66e4be6e623369d43d3e;testNANInVolume.nrrd
 c120e8dbe44741a0750960a44142120d;ITKSnapSegmentation.nii.gz
 d72691e556ed51d122365739058c0353;OldSlicerSegmentation.seg.nrrd
 b5ac535a252adbfb78ea84ab0f11d22f;SlicerSegmentation.seg.nrrd
+5b89cfa7f777782cbfd80303f27e3120;helix-DWI.nhdr
+bd050a9787df3d86d5e0c3ee9af36117;helix-DWI.raw.gz

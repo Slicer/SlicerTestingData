@@ -119,3 +119,5 @@
 | [ITKSnapSegmentation.nii.gz](https://github.com/Slicer/SlicerTestingData/releases/download/MD5/c120e8dbe44741a0750960a44142120d) | c120e8dbe44741a0750960a44142120d |
 | [OldSlicerSegmentation.seg.nrrd](https://github.com/Slicer/SlicerTestingData/releases/download/MD5/d72691e556ed51d122365739058c0353) | d72691e556ed51d122365739058c0353 |
 | [SlicerSegmentation.seg.nrrd](https://github.com/Slicer/SlicerTestingData/releases/download/MD5/b5ac535a252adbfb78ea84ab0f11d22f) | b5ac535a252adbfb78ea84ab0f11d22f |
+| [helix-DWI.nhdr](https://github.com/Slicer/SlicerTestingData/releases/download/MD5/5b89cfa7f777782cbfd80303f27e3120) | 5b89cfa7f777782cbfd80303f27e3120 |
+| [helix-DWI.raw.gz](https://github.com/Slicer/SlicerTestingData/releases/download/MD5/bd050a9787df3d86d5e0c3ee9af36117) | bd050a9787df3d86d5e0c3ee9af36117 |
