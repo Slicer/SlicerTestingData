@@ -121,3 +121,4 @@
 | [SlicerSegmentation.seg.nrrd](https://github.com/Slicer/SlicerTestingData/releases/download/MD5/b5ac535a252adbfb78ea84ab0f11d22f) | b5ac535a252adbfb78ea84ab0f11d22f |
 | [helix-DWI.nhdr](https://github.com/Slicer/SlicerTestingData/releases/download/MD5/5b89cfa7f777782cbfd80303f27e3120) | 5b89cfa7f777782cbfd80303f27e3120 |
 | [helix-DWI.raw.gz](https://github.com/Slicer/SlicerTestingData/releases/download/MD5/bd050a9787df3d86d5e0c3ee9af36117) | bd050a9787df3d86d5e0c3ee9af36117 |
+| [moving.nrrd](https://github.com/Slicer/SlicerTestingData/releases/download/MD5/f50f2a1a3b6c47faeabdd6d02319e369) | f50f2a1a3b6c47faeabdd6d02319e369 |
