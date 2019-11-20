@@ -123,3 +123,4 @@
 | [helix-DWI.raw.gz](https://github.com/Slicer/SlicerTestingData/releases/download/MD5/bd050a9787df3d86d5e0c3ee9af36117) | bd050a9787df3d86d5e0c3ee9af36117 |
 | [moving.nrrd](https://github.com/Slicer/SlicerTestingData/releases/download/MD5/f50f2a1a3b6c47faeabdd6d02319e369) | f50f2a1a3b6c47faeabdd6d02319e369 |
 | [MRHeadResampledHField.nrrd](https://github.com/Slicer/SlicerTestingData/releases/download/MD5/b2de1ffaa199da2654b30ba55e31ddfd) | b2de1ffaa199da2654b30ba55e31ddfd |
+| [Brain_slice.nrrd](https://github.com/Slicer/SlicerTestingData/releases/download/MD5/344c54d3f6121d0869490fcf9e4df491) | 344c54d3f6121d0869490fcf9e4df491 |
