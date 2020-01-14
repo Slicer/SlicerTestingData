@@ -7,9 +7,9 @@ It can be run from the command-line.
 
 Requires `githubrelease` package to be installed, installable with ``pip install githubrelease``.
 
-Download MD5 hashed files to DOWNLOAD folder::
+Download SHA256 hashed files to DOWNLOAD folder::
 
-    python process_release_data.py download --hashalgo MD5 --github-token 123123...123
+    python process_release_data.py download --hashalgo SHA256 --github-token 123123...123
 
 Upload all hashes from INCOMING folder::
 
@@ -273,11 +273,11 @@ if __name__ == "__main__":
     )
     parser.add_argument(
         "operation",
-        help="operation to perform. Valid values: download, upload. Upload adds all files in INCOMING folder. Download gets all files in the .csv index to DOWNLOAD folder.",
+        help="operation to perform. Valid values: download, upload. Upload adds all files in INCOMING folder. Download gets all files in the .csv index to (hash-algo)-DOWNLOAD folder.",
     )
     parser.add_argument(
         "--hash-algo",
-        help="hashing algorithm name. If not specified then all algorithms are used for upload and MD5 used for download. Valid values: MD5, SHA256, SHA224, SHA384, SHA512.",
+        help="hashing algorithm name. If not specified then SHA256 is used. Valid values: MD5, SHA256, SHA224, SHA384, SHA512.",
     )
     parser.add_argument(
         "--github-token",
@@ -296,12 +296,12 @@ if __name__ == "__main__":
     root_dir = os.path.dirname(os.path.realpath(__file__))
 
     if operation == "download":
-        hashalgo = args.hash_algo if args.hash_algo else "MD5"
-        download_dir = os.path.join(root_dir, "DOWNLOAD")
+        hashalgo = args.hash_algo if args.hash_algo else "SHA256"
+        download_dir = os.path.join(root_dir, hashalgo + "-DOWNLOAD")
         download(repo_name, root_dir, download_dir, hashalgo, github_token)
     elif operation == "upload":
         incoming_dir = os.path.join(root_dir, "INCOMING")
-        hashalgos = [args.hash_algo] if args.hash_algo else ["MD5", "SHA256"]
+        hashalgos = [args.hash_algo] if args.hash_algo else ["SHA256"]
         for hashalgo in hashalgos:
             logging.info("Uploading " + hashalgo)
             upload(repo_name, root_dir, incoming_dir, hashalgo, github_token)
