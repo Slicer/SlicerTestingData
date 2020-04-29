@@ -28,6 +28,13 @@ import github_release
 from shutil import copyfile
 
 
+COLUMN_CHECKSUM = 0
+COLUMN_FILENAME = 1
+COLUMN_FILEDATE = 2
+COLUMN_LOCAL_FILENAME = 3
+
+DEFAULT_FILE_DATE_UTC_STRING="2020-01-01T12:00:00.0Z"
+
 def get_hashcmd(hashalgo):
     """Get function that can compute hash for a filename"""
     import hashlib
@@ -76,38 +83,83 @@ def read_fileindex_csv(hashalgo_csv):
     fileindex = []
     with open(hashalgo_csv, "r") as f:
         for line in f:
-            [checksum, filename] = line.rstrip().split(";")
-            fileindex.append([checksum, filename])
+            fields = line.rstrip().split(";")
+            if len(fields) <= COLUMN_FILEDATE:
+                fields.append("")  # if date is missing then add an empty field
+            fileindex.append(fields)
     return fileindex
 
 
 def write_fileindex_csv(hashalgo_csv, fileindex):
     with open(hashalgo_csv, "wb") as f:
-        for [checksum, filename] in fileindex:
-            f.write(bytes(checksum + ";" + filename + "\n", "UTF-8"))
+        for fileindex_item in fileindex:
+            fields = [fileindex_item[COLUMN_CHECKSUM], fileindex_item[COLUMN_FILENAME]]
+            if len(fileindex_item) > COLUMN_FILEDATE:
+                fields.append(fileindex_item[COLUMN_FILEDATE])
+            f.write(bytes(";".join(fields) + "\n", "UTF-8"))
 
 
-def write_fileindex_md(hashalgo_md, fileindex, repo_name, hashalgo):
+def write_fileindex_md(hashalgo_md, fileindex, repo_name, hashalgo, format=None, include_local_filename=False):
+    """Write file index as markdown.
+    format: list or table
+    """
+    if format is None:
+        format = "list"
     with open(hashalgo_md, "wb") as f:
-        f.write(bytes("| FileName | " + hashalgo + " |\n", "UTF-8"))
-        f.write(bytes("|----------|-------------|\n", "UTF-8"))
-        for [checksum, filename] in fileindex:
-            f.write(
-                bytes(
-                    "| ["
-                    + filename
-                    + "](https://github.com/"
-                    + repo_name
-                    + "/releases/download/"
-                    + hashalgo
-                    + "/"
-                    + checksum
-                    + ") | "
-                    + checksum
-                    + "\n",
-                    "UTF-8",
-                )
-            )
+        if format=="table":
+            header = []
+            header.append("| FileName | FileDate | " + hashalgo + " |\n")
+            header.append("|----------|----------|-------------|\n")
+            if include_local_filename:
+                header[0] = "| LocalFileName " + header[0]
+                header[1] = "|---------------" + header[1]
+            for header_line in header:
+                f.write(bytes(header_line, "UTF-8"))
+        for fileindex_item in fileindex:
+            checksum = fileindex_item[COLUMN_CHECKSUM]
+            filename = fileindex_item[COLUMN_FILENAME]
+            filedate = fileindex_item[COLUMN_FILEDATE] if len(fileindex_item) > COLUMN_FILEDATE else ""
+            local_filename = fileindex_item[COLUMN_LOCAL_FILENAME] if len(fileindex_item) > COLUMN_LOCAL_FILENAME else ""
+            if format=="table":
+                row = ""
+                if include_local_filename:
+                    row += "| " + local_filename + " "
+                row += "| [" + filename + "](https://github.com/" + repo_name + "/releases/download/" + hashalgo + "/" + checksum + ") "
+                row += "| " + filedate + " "
+                row += "| " + checksum + " "
+                f.write(bytes(row + "|\n", "UTF-8",))
+            else:
+                f.write(bytes("- [" + filename + "](https://github.com/" + repo_name + "/releases/download/" + hashalgo + "/" + checksum + ")\n", "UTF-8",))
+                if include_local_filename:
+                    f.write(bytes("  - LocalFileName: " + local_filename + "\n", "UTF-8",))
+                if filedate:
+                    f.write(bytes("  - FileDate: " + filedate + "\n", "UTF-8",))
+                f.write(bytes("  - " + hashalgo +": " + checksum + "\n", "UTF-8",))
+
+
+def get_filedate(filepath):
+    # Return
+    import datetime
+    return datetime.datetime.utcfromtimestamp(os.path.getmtime(filepath)).replace(tzinfo=datetime.timezone.utc)
+
+def set_filedate(filepath, filedate):
+    stat = os.stat(filepath)
+    atime = stat.st_atime
+    os.utime(filepath, (atime, filedate.timestamp()))
+
+def date_to_utc_string(filedate):
+    """Convert date object to string in UTC time zone"""
+    return filedate.isoformat()
+
+def date_from_utc_string(filedate_utc_string):
+    """Convert string in UTC time zone to date object"""
+    # We only accept date in UTC (indicated by +00:00 or Z suffix)
+    import datetime
+    try:
+        date_object = datetime.datetime.strptime(filedate_utc_string, "%Y-%m-%dT%H:%M:%S.%f+00:00").replace(tzinfo=datetime.timezone.utc)
+    except ValueError:
+        date_object = datetime.datetime.strptime(filedate_utc_string, "%Y-%m-%dT%H:%M:%S.%fZ").replace(tzinfo=datetime.timezone.utc)
+    return date_object
 
 
 def download(repo_name, root_dir, download_dir, hashalgo, github_token=None):
@@ -136,11 +188,18 @@ def download(repo_name, root_dir, download_dir, hashalgo, github_token=None):
     filenames = [checksum_filename[1] for checksum_filename in fileindex]
     from collections import Counter
 
+    # Sort based on filename and filedate
+    fileindex.sort(key=lambda a: (a[COLUMN_FILENAME].casefold(), a[COLUMN_FILEDATE]))
+
     filenames_counter = Counter(filenames)
     # download saves files to current working directory, so we need to temporarily
     # change working dir to hashalgo_dir folder
     with cd(hashalgo_dir):
-        for [checksum, filename] in fileindex:
+        fileindex_with_local_filename = []
+        for fileindex_item in fileindex:
+            checksum = fileindex_item[COLUMN_CHECKSUM]
+            filename = fileindex_item[COLUMN_FILENAME]
+            filedate = fileindex_item[COLUMN_FILEDATE] if len(fileindex_item) > COLUMN_FILEDATE else ""
             filepath = os.path.join(hashalgo_dir, checksum)
             if not os.path.isfile(filepath):
                 if not github_release.gh_asset_download(repo_name, hashalgo, checksum):
@@ -156,16 +215,28 @@ def download(repo_name, root_dir, download_dir, hashalgo, github_token=None):
                 logging.debug(
                     hashalgo + ": downloaded " + filename + " (" + checksum + ")"
                 )
-            # copying to download folder with real filename
+
+            # determine local filename
             if filenames_counter[filename] == 1:
                 # unique filename
-                copyfile(filepath, os.path.join(download_dir, filename))
+                local_filename = filename
             else:
                 # multiple versions of the filename with different content
                 # add checksum as suffix to distinguish them
-                copyfile(
-                    filepath, os.path.join(download_dir, filename + "." + checksum)
-                )
+                local_filename = filename + "." + checksum
+            local_filepath = os.path.join(download_dir, local_filename)
+
+            # set file name and date from index
+            copyfile(filepath, local_filepath)
+            set_filedate(local_filepath, date_from_utc_string(filedate if filedate else DEFAULT_FILE_DATE_UTC_STRING))
+
+            # save local fileindex
+            fileindex_with_local_filename.append([checksum, filename, filedate, local_filename])
+
+        # Create new hashalgo.csv from existing and incoming files
+        write_fileindex_csv(hashalgo_csv, fileindex)
+        hashalgo_local_md = os.path.join(download_dir, hashalgo + "_local.md")
+        write_fileindex_md(hashalgo_local_md, fileindex_with_local_filename, repo_name, hashalgo, include_local_filename=True)
 
 
 def upload(repo_name, root_dir, incoming_dir, hashalgo, github_token=None):
@@ -222,18 +293,20 @@ def upload(repo_name, root_dir, incoming_dir, hashalgo, github_token=None):
     for filename in filenames:
         filepath = os.path.join(incoming_dir, filename)
         checksum = hashcmd(filepath)
-        try:
-            fileindex.index([checksum, filename])
-        except ValueError:
+        filedate = date_to_utc_string(get_filedate(filepath))
+
+        existingItems = [fileindex_item for fileindex_item in fileindex
+            if fileindex_item[COLUMN_CHECKSUM] == checksum and fileindex_item[COLUMN_FILENAME] == filename]
+        if not existingItems:
             # new item
-            fileindex.append([checksum, filename])
+            fileindex.append([checksum, filename, filedate])
         # Make sure the hash-named file is present
         hashfilepath = os.path.join(hashalgo_dir, checksum)
         if not os.path.isfile(hashfilepath):
             copyfile(filepath, hashfilepath)
 
     # Create new hashalgo.csv from existing and incoming files
-    fileindex.sort(key=lambda a: (a[1].casefold(), a[0]))
+    fileindex.sort(key=lambda a: (a[COLUMN_FILENAME].casefold(), a[COLUMN_FILEDATE]))
     write_fileindex_csv(hashalgo_csv, fileindex)
     hashalgo_md = os.path.join(root_dir, hashalgo_dir, hashalgo + ".md")
     write_fileindex_md(hashalgo_md, fileindex, repo_name, hashalgo)
@@ -252,7 +325,9 @@ def upload(repo_name, root_dir, incoming_dir, hashalgo, github_token=None):
     github_release.gh_asset_upload(repo_name, hashalgo, hashalgo_md)
 
     # Upload new data files
-    for [checksum, filename] in fileindex:
+    for fileindex_item in fileindex:
+        checksum = fileindex_item[COLUMN_CHECKSUM]
+        filename = fileindex_item[COLUMN_FILENAME]
         if checksum in uploaded_hashes:
             # already uploaded
             continue
