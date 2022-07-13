@@ -337,6 +337,12 @@ def upload(repo_name, root_dir, incoming_dir, hashalgo, github_token=None):
     # Copy md file content into release notes
     with open(hashalgo_md, "r") as file:
         release_notes = file.read()
+
+    if len(release_notes) > 125000:
+        note = "Since the release description is > 125000 characters, the corresponding markdown file is instead pushed into the repository."
+        release_notes = f"See [{hashalgo}.md](https://github.com/{repo_name}/blob/main/{hashalgo}/{hashalgo}.md)\n\n_{note}_"
+        logging.warning(f"{hashalgo}: {note}")
+
     github_release.gh_release_edit(repo_name, hashalgo, body=release_notes)
 
 
